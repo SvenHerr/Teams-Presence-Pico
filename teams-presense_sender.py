@@ -55,7 +55,7 @@ if os.path.isfile(str(os.getcwd()) + "/pc-pi_config.ini"):
     sleepValue = config["Setting"]["sleepvalue"]
 else:
     printwarning("Config does not exist, creating new file.")
-    path = "C:/Users/User/AppData/Roaming/Microsoft/Teams/"
+    path = "C:/Users/YourUser/AppData/Roaming/Microsoft/Teams/"
     fileName = "logs.txt"
     while not path:
         path = input("Please enter your location path: ")
