@@ -5,6 +5,8 @@
 
 import sys
 import machine
+import neopixel
+import board
 
 led = machine.Pin(25, machine.Pin.OUT)
 led(1)
@@ -13,6 +15,9 @@ LedRed = 1
 LedGreen = 3
 LedYellow = 2
 LedBlue = 0
+
+# This is for LED Strips
+pixels = neopixel.NeoPixel(board.D18, 30)
 
 led_red = machine.Pin(LedRed, machine.Pin.OUT)
 led_green = machine.Pin(LedGreen, machine.Pin.OUT)
@@ -24,18 +29,26 @@ def leds_off():
     led_green.value(0)
     led_yellow.value(0)
     led_blue.value(0)
+    # This is for LED Strips
+    pixels.fill((0, 0, 0))
 
 def setRedLedOn():
     leds_off()
     led_red.value(1)
+    # This is for LED Strips
+    pixels.fill((255, 0, 0))
 
 def setGreenLedOn():
     leds_off()
     led_green.value(1)
+    # This is for LED Strips
+    pixels.fill((0, 255, 0))
 
 def setYellowLedOn():
     leds_off()
     led_yellow.value(1)
+    # This is for LED Strips
+    pixels.fill((255, 255, 0))
 
 def setBlueLedOn():
     leds_off()
