@@ -113,7 +113,7 @@ def setUserName():
 def connect():
     try:
        global s
-       s = serial.Serial("COM3", 9600)
+       s = serial.Serial("COM3", 9600, timeout=3)
     except Exception as err:
         print()
         print('Error: Connection not possible!')
