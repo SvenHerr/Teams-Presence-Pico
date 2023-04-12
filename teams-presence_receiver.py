@@ -79,16 +79,12 @@ while True:
     #send_string('ok\n')
     v = sys.stdin.readline().strip()
 
-    if v =='Available' :
+    if v =='Available' or v == 'NewActivity' :
         setGreenLedOn()
-    elif v =='BeRightBack' :
+    elif v =='BeRightBack' or v =='Away' :
         setYellowLedOn()
-    elif v =='Busy' :
+    elif v =='Busy' or v =='DoNotDisturb' or v == 'Presenting' or v == 'OnThePhone' or v == 'Focusing':
         setRedLedOn()
-    elif v =='DoNotDisturb' :
-        setRedLedOn()
-    elif v =='Away' :
-        setYellowLedOn()
     elif v =='Offline' :
         setBlueLedOn()
 
