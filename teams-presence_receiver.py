@@ -83,7 +83,7 @@ while True:
         setGreenLedOn()
     elif v =='BeRightBack' or v =='Away' :
         setYellowLedOn()
-    elif v =='Busy' or v =='DoNotDisturb' or v == 'Presenting' or v == 'OnThePhone' or v == 'Focusing':
+    elif v =='Busy' or v =='DoNotDisturb' or v == 'Presenting' or v == 'OnThePhone' or v == 'Focusing' or v == 'InAMeeting':
         setRedLedOn()
     elif v =='Offline' :
         setBlueLedOn()
