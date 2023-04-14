@@ -75,11 +75,13 @@ def checkUpdate():
             printwarning("There is an update available.")
             printwarning(
                 "Head over to https://github.com/SvenHerr/Teams-Presence-Pico to get the latest features.")
+            sleep(5)
         else:
             print("Application is running latest version.")
     except Exception as e:
         printerror("An error occured while searching for updates.")
         printerror(e)
+        sleep(5)
 
 
 def countdown(t):
