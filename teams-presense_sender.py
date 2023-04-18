@@ -22,6 +22,28 @@ version = 1.0
 global loopRun
 loopRun = True
 
+# Depends on your language settings
+language = "German"
+if language == "German":
+    busy = ""
+    onThePhone = ""
+    away = "Abwesend"
+    beRightBack = ""
+    doNotDisturb = ""
+    focusing = ""
+    presenting = ""
+    inAMeeting = ""
+else:
+    busy = ""
+    onThePhone = ""
+    away = "Abwesend"
+    beRightBack = ""
+    doNotDisturb = ""
+    focusing = ""
+    presenting = ""
+    inAMeeting = ""
+
+
 print("Welcome to Microsoft Teams presence for Pi!")
 print("Loading modules...")
 
@@ -66,6 +88,8 @@ else:
         config.write(configfile)
 
 # Checks for updates
+
+
 def checkUpdate():
     updateUrl = "https://raw.githubusercontent.com/SvenHerr/Teams-Presence-Pico/master/doc/version"
     try:
@@ -94,6 +118,8 @@ def countdown(t):
     print("                                      ", end="\r")
 
 # Handles Ctrl+C
+
+
 def handler(signal_received, frame):
     # Handle any cleanup here
     printwarning(
@@ -103,6 +129,7 @@ def handler(signal_received, frame):
     print()
     exit(0)
 
+
 def setUserName():
     for line1 in reversed(list(open(path + fileName))):
         if 'CREATE_USER' in line1:
@@ -111,6 +138,7 @@ def setUserName():
             global name
             name = x.user.profile.name
             break
+
 
 def connect():
     try:
@@ -122,10 +150,12 @@ def connect():
         print('Please connect device and try again!')
         exit(1)
 
+
 def getStatusbyte(status):
     return bytes(status + "\n", encoding='utf-8')
 
-def getStatusFromFile():
+
+def getStatusFromFileOld():
     word = 'Added'
     startIndex = re.search(r'\b({})\b'.format(word), line).start()
     endIndex = startIndex + word.__len__()
@@ -135,14 +165,50 @@ def getStatusFromFile():
     whitespace = statusLine.find(' ')
 
     # retracts status
-    status = statusLine[:whitespace] 
-    return status  
+    status = statusLine[:whitespace]
+    return status
+
+
+def getStatusFromFile():
+    if ("StatusIndicatorStateService: Added NewActivity (current state: Busy -> NewActivity" in line or 
+        "Setting the taskbar overlay icon - " + busy in line or 
+        "StatusIndicatorStateService: Added Busy" or 
+        "Setting the taskbar overlay icon - " + onThePhone in line or  
+        "StatusIndicatorStateService: Added OnThePhone"):
+        return "Busy"
+    elif ("StatusIndicatorStateService: Added NewActivity (current state: Away -> NewActivity" in line or  
+        "Setting the taskbar overlay icon - " + away in line or  
+        "StatusIndicatorStateService: Added Away"):
+        return "Away"
+    elif ("StatusIndicatorStateService: Added NewActivity (current state: BeRightBack -> NewActivity" in line or 
+        "Setting the taskbar overlay icon - " + beRightBack in line or  
+        "StatusIndicatorStateService: Added BeRightBack"):
+        return "BeRightBack"
+    elif ("StatusIndicatorStateService: Added NewActivity (current state: DoNotDisturb -> NewActivity" in line or 
+        "Setting the taskbar overlay icon - " + doNotDisturb in line or  
+        "StatusIndicatorStateService: Added DoNotDisturb"):
+        return "DoNotDisturb"
+    elif ("StatusIndicatorStateService: Added NewActivity (current state: Focusing -> NewActivity" in line or  
+        "Setting the taskbar overlay icon - " + focusing in line or  
+        "StatusIndicatorStateService: Added Focusing"):
+        return "Focusing"
+    elif ("StatusIndicatorStateService: Added NewActivity (current state: Presenting -> NewActivity" in line or 
+        "Setting the taskbar overlay icon - " + presenting in line or  
+        "StatusIndicatorStateService: Added Presenting"):
+        return "Presenting"
+    elif ("StatusIndicatorStateService: Added NewActivity (current state: InAMeeting -> NewActivity" in line or 
+        "Setting the taskbar overlay icon - " + inAMeeting in line or 
+        "StatusIndicatorStateService: Added InAMeeting"):
+        return "InAMeeting"
+    else: 
+        return "Available"
+
 
 # Main
 if __name__ == '__main__':
     # Tell Python to run the handler() function when SIGINT is recieved
     signal(SIGINT, handler)
-    
+
     try:
         checkUpdate()
     except Exception as err:
@@ -152,13 +218,13 @@ if __name__ == '__main__':
 
     setUserName()
     connect()
-        
+
     while loopRun:
         for line in reversed(list(open(path + fileName))):
-            if 'current state' in line:
+            if 'StatusIndicatorStateService' or 'Setting the taskbar overlay' in line:
                 # on windows
                 os.system('cls')
-                
+
                 status = getStatusFromFile()
                 statusbyte = getStatusbyte(status)
                 s.write(statusbyte)
@@ -167,7 +233,8 @@ if __name__ == '__main__':
                 print("            MSFT Teams Presence")
                 print("============================================")
                 print()
-                print('Hi ' + name + ','+' your currrent state is => ' + status + '')
+                print('Hi ' + name + ',' +
+                      ' your currrent state is => ' + status + '')
                 now = datetime.now()
                 print("Last File call:\t\t" + now.strftime("%Y-%m-%d %H:%M:%S"))
 
