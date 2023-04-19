@@ -22,28 +22,6 @@ version = 1.0
 global loopRun
 loopRun = True
 
-# Depends on your language settings
-language = "German"
-if language == "German":
-    busy = ""
-    onThePhone = ""
-    away = "Abwesend"
-    beRightBack = ""
-    doNotDisturb = ""
-    focusing = ""
-    presenting = ""
-    inAMeeting = ""
-else:
-    busy = ""
-    onThePhone = ""
-    away = "Abwesend"
-    beRightBack = ""
-    doNotDisturb = ""
-    focusing = ""
-    presenting = ""
-    inAMeeting = ""
-
-
 print("Welcome to Microsoft Teams presence for Pi!")
 print("Loading modules...")
 
@@ -69,7 +47,8 @@ except:
 sleep(2)
 
 config = configparser.ConfigParser()
-if os.path.isfile(str(os.getcwd()) + "/pc-pi_config.ini"):
+test = str(os.getcwd())
+if os.path.isfile(str("D:/TFS/Scripte/pc-pi_config.ini")):
     print("Reading config...")
     config.read("pc-pi_config.ini")
     path = config["Setting"]["path"]
@@ -88,8 +67,6 @@ else:
         config.write(configfile)
 
 # Checks for updates
-
-
 def checkUpdate():
     updateUrl = "https://raw.githubusercontent.com/SvenHerr/Teams-Presence-Pico/master/doc/version"
     try:
@@ -99,13 +76,11 @@ def checkUpdate():
             printwarning("There is an update available.")
             printwarning(
                 "Head over to https://github.com/SvenHerr/Teams-Presence-Pico to get the latest features.")
-            sleep(5)
         else:
             print("Application is running latest version.")
     except Exception as e:
         printerror("An error occured while searching for updates.")
         printerror(e)
-        sleep(5)
 
 
 def countdown(t):
@@ -118,8 +93,6 @@ def countdown(t):
     print("                                      ", end="\r")
 
 # Handles Ctrl+C
-
-
 def handler(signal_received, frame):
     # Handle any cleanup here
     printwarning(
@@ -128,7 +101,6 @@ def handler(signal_received, frame):
     s.write(status)
     print()
     exit(0)
-
 
 def setUserName():
     for line1 in reversed(list(open(path + fileName))):
@@ -139,23 +111,20 @@ def setUserName():
             name = x.user.profile.name
             break
 
-
 def connect():
     try:
        global s
-       s = serial.Serial("COM3", 9600, timeout=3)
+       s = serial.Serial("COM6", 9600, timeout=3)
     except Exception as err:
         print()
         print('Error: Connection not possible!')
         print('Please connect device and try again!')
         exit(1)
 
-
 def getStatusbyte(status):
     return bytes(status + "\n", encoding='utf-8')
 
-
-def getStatusFromFileOld():
+def getStatusFromFile():
     word = 'Added'
     startIndex = re.search(r'\b({})\b'.format(word), line).start()
     endIndex = startIndex + word.__len__()
@@ -165,50 +134,14 @@ def getStatusFromFileOld():
     whitespace = statusLine.find(' ')
 
     # retracts status
-    status = statusLine[:whitespace]
-    return status
-
-
-def getStatusFromFile():
-    if ("StatusIndicatorStateService: Added NewActivity (current state: Busy -> NewActivity" in line or 
-        "Setting the taskbar overlay icon - " + busy in line or 
-        "StatusIndicatorStateService: Added Busy" or 
-        "Setting the taskbar overlay icon - " + onThePhone in line or  
-        "StatusIndicatorStateService: Added OnThePhone"):
-        return "Busy"
-    elif ("StatusIndicatorStateService: Added NewActivity (current state: Away -> NewActivity" in line or  
-        "Setting the taskbar overlay icon - " + away in line or  
-        "StatusIndicatorStateService: Added Away"):
-        return "Away"
-    elif ("StatusIndicatorStateService: Added NewActivity (current state: BeRightBack -> NewActivity" in line or 
-        "Setting the taskbar overlay icon - " + beRightBack in line or  
-        "StatusIndicatorStateService: Added BeRightBack"):
-        return "BeRightBack"
-    elif ("StatusIndicatorStateService: Added NewActivity (current state: DoNotDisturb -> NewActivity" in line or 
-        "Setting the taskbar overlay icon - " + doNotDisturb in line or  
-        "StatusIndicatorStateService: Added DoNotDisturb"):
-        return "DoNotDisturb"
-    elif ("StatusIndicatorStateService: Added NewActivity (current state: Focusing -> NewActivity" in line or  
-        "Setting the taskbar overlay icon - " + focusing in line or  
-        "StatusIndicatorStateService: Added Focusing"):
-        return "Focusing"
-    elif ("StatusIndicatorStateService: Added NewActivity (current state: Presenting -> NewActivity" in line or 
-        "Setting the taskbar overlay icon - " + presenting in line or  
-        "StatusIndicatorStateService: Added Presenting"):
-        return "Presenting"
-    elif ("StatusIndicatorStateService: Added NewActivity (current state: InAMeeting -> NewActivity" in line or 
-        "Setting the taskbar overlay icon - " + inAMeeting in line or 
-        "StatusIndicatorStateService: Added InAMeeting"):
-        return "InAMeeting"
-    else: 
-        return "Available"
-
+    status = statusLine[:whitespace] 
+    return status  
 
 # Main
 if __name__ == '__main__':
     # Tell Python to run the handler() function when SIGINT is recieved
     signal(SIGINT, handler)
-
+    
     try:
         checkUpdate()
     except Exception as err:
@@ -218,23 +151,23 @@ if __name__ == '__main__':
 
     setUserName()
     connect()
-
+        
     while loopRun:
         for line in reversed(list(open(path + fileName))):
-            if 'StatusIndicatorStateService' or 'Setting the taskbar overlay' in line:
+            if 'StatusIndicatorStateService: Added' in line:
                 # on windows
                 os.system('cls')
-
+                
                 status = getStatusFromFile()
                 statusbyte = getStatusbyte(status)
-                s.write(statusbyte)
+                if 'NewActivity' not in status:
+                    s.write(statusbyte)
 
                 print("============================================")
                 print("            MSFT Teams Presence")
                 print("============================================")
                 print()
-                print('Hi ' + name + ',' +
-                      ' your currrent state is => ' + status + '')
+                print('Hi ' + name + ','+' your currrent state is => ' + status + '')
                 now = datetime.now()
                 print("Last File call:\t\t" + now.strftime("%Y-%m-%d %H:%M:%S"))
 
