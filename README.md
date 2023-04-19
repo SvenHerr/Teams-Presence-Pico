@@ -4,7 +4,9 @@ The receiver script runs on raspbery pi (pico) and the sender runs on windows.
 
 Teams stores the log of status and a lot more locally in a Txt file.
 The script looks for the last status in the log file and sends it to the receiver. 
-Here we can display the status with lights or LEDs 
+Here we can display the status with lights or LEDs.
+
+Please be aware of your sereal port mine is COM6 and on another machine COM3!
 
 A Small tutorial will be available soon on <a href="https://dev.to/svenherr">Dev.to/svenherr</a>
 
